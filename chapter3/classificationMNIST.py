@@ -13,6 +13,8 @@ import joblib
 import matplotlib
 import numpy as np
 from sklearn.linear_model import SGDClassifier
+from sklearn.model_selection import StratifiedKFold
+from sklearn.base import clone
 
 '''
 # da primeira vez faz isso: 
@@ -67,3 +69,23 @@ plt.axis('off')
 plt.show()
 print(Y_TREINO[1])
 print(sgd_clf.predict([DIGITO])) #TEY 
+
+#performarnce measures: evalidar um classificador é mais dificil que um regressor
+
+#===========Cross validation: measuring accuracy==============================
+
+#construindo um cross validador, dado que o cross_val_score é mto limitado
+
+skfolds = StratifiedKFold(n_splits=3, random_state=42)
+
+for train_index, test_index in skfolds.split(X_TREINO, Y_TREINO_0):
+    clone_clf = clone(sgd_clf)
+    X_TREINO_FOLDS = X_TREINO[train_index]
+    Y_TREINO_FOLDS = Y_TREINO_0[train_index]
+    X_TESTE_FOLDS = X_TESTE[test_index]
+    Y_TESTE_FOLDS = Y_TREINO_0[test_index]
+    
+    clone_clf.fit(X_TREINO_FOLDS, Y_TREINO_FOLDS)
+    y_pred = clone_clf.predict(X_TESTE_FOLD)
+    n_correct = sum(y_pred == Y_TREINO_FOLDS)
+    print(n_correct/(len(y_pred)))
